@@ -1,1 +1,8 @@
 /airbnb-open-data-in-nyc
+calendar_detail.csv
+neighbourhoods.csv
+reviews_summary.csv
+listings_detail.csv
+neighbourhoods.geojson
+listings_summary.csv
+reviews_detail.csv
