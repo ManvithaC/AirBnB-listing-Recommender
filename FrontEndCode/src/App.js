@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 import './App.css';
+import axios from 'axios';
 import FloatingActionButtons from './button.js';
-import SimpleCard from './card.js';
+import TitlebarGridList from './GridList.js';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
@@ -25,10 +26,31 @@ const styles = theme => ({
   },
 });
 
-
 class App extends Component {
-  state = {
 
+  getRecommendedListings = () => {
+    const listing_url = this.state.name;
+    console.log(listing_url);
+    axios.get(`https://jsonplaceholder.typicode.com/users`, { listing_url })
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+      })
+  };
+
+  state = {
+    tileData :
+      [{
+        picture_url: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&h=350',
+        listing_id: '18461891',
+        listing_url: 'https://www.airbnb.com/rooms/18461891',
+      },
+        {
+          picture_url: 'https://a0.muscache.com/im/pictures/102394774/b3fe45ce_original.jpg?aki_policy=large',
+          listing_id: '21135710',
+          listing_url: 'https://www.airbnb.com/rooms/21135710',
+        }],
+    name : ''
   };
 
   handleChange = name => event => {
@@ -42,21 +64,23 @@ class App extends Component {
       <MuiThemeProvider>
         <div className="App">
           <Typography className="mt-2" component="h4" variant="h4" gutterBottom>
-            Sentiment Analysis
+            Airbnb Listings Recommendation System
           </Typography>
           <div className="row">
             <div className="mt-3 mr-5 ml-5 col-md-11">
               <TextField
                 id="outlined-full-width"
-                label="Comment/Description"
+                label="Enter the listing URL"
                 style={{ margin: 8 }}
                 multiline
-                rows="10"
-                placeholder="I love this house"
-                helperText="Enter the comments you would like to calculate the sentiment for."
+                rows="1"
+                placeholder="https://example-listing-id.com"
+                helperText="Enter the url you would like to get the recommendations for"
                 fullWidth
                 margin="normal"
                 variant="outlined"
+                value={this.state.name}
+                onChange={this.handleChange('name')}
                 InputLabelProps={{
                   shrink: true,
                 }}
@@ -64,18 +88,10 @@ class App extends Component {
             </div>
           </div>
           <div className="row justify-content-center">
-            <FloatingActionButtons></FloatingActionButtons>
+            <FloatingActionButtons getRecommendedListings={this.getRecommendedListings}></FloatingActionButtons>
           </div>
-          <div className={"row"}>
-            <div className={"col-md-3 m-5"}>
-              <SimpleCard heading="Score"/>
-            </div>
-            <div className={"col-md-3 m-5"}>
-              <SimpleCard heading="Polarity"/>
-            </div>
-            <div className={"col-md-3 m-5"}>
-              <SimpleCard heading="Example"/>
-            </div>
+          <div className={"row m-5"}>
+            <TitlebarGridList tileData={this.state.tileData}/>
           </div>
         </div>
       </MuiThemeProvider>
