@@ -31,10 +31,9 @@ class App extends Component {
   getRecommendedListings = () => {
     const listing_url = this.state.name;
     console.log(listing_url);
-    axios.get(`https://jsonplaceholder.typicode.com/users`, { listing_url })
+    axios.post(`http://jsonplaceholder.typicode.com/users`, { url: listing_url })
       .then(res => {
-        console.log(res);
-        console.log(res.data);
+        this.setState({ tileData: res.data})
       })
   };
 
