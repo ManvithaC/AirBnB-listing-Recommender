@@ -33,6 +33,7 @@ class App extends Component {
       url: this.state.name
     }
     console.log(listing_url);
+<<<<<<< HEAD
     axios.post('http://localhost:8000/query', {
       url: this.state.name
     })
@@ -48,6 +49,11 @@ class App extends Component {
         console.log(res);
         console.log(res.data);
         //this.setState({ tileData: res.data})
+=======
+    axios.post(`http://jsonplaceholder.typicode.com/users`, { url: listing_url })
+      .then(res => {
+        this.setState({ tileData: res.data})
+>>>>>>> f80845ef5f4909f090aeaf1df5626fbee0be90e4
       })
       */
   };
