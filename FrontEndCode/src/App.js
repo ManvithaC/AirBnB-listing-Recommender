@@ -29,13 +29,27 @@ const styles = theme => ({
 class App extends Component {
 
   getRecommendedListings = () => {
-    const listing_url = this.state.name;
+    const listing_url = {
+      url: this.state.name
+    }
     console.log(listing_url);
-    axios.get(`https://jsonplaceholder.typicode.com/users`, { listing_url })
+    axios.post('http://localhost:8000/query', {
+      url: this.state.name
+    })
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    /*
+    axios.post(`http://localhost:8000/query`, { listing_url })
       .then(res => {
         console.log(res);
         console.log(res.data);
+        //this.setState({ tileData: res.data})
       })
+      */
   };
 
   state = {
