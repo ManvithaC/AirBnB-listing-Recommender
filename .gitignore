@@ -7,3 +7,4 @@ neighbourhoods.geojson
 listings_summary.csv
 reviews_detail.csv
 .ipynb_checkpoints
+/Django_backend/recommend_list/recommend/listings_detail.csv
