@@ -29,47 +29,21 @@ const styles = theme => ({
 class App extends Component {
 
   getRecommendedListings = () => {
-    const listing_url = {
-      url: this.state.name
-    }
-    console.log(listing_url);
-<<<<<<< HEAD
     axios.post('http://localhost:8000/query', {
       url: this.state.name
     })
-    .then(function (response) {
-      console.log(response);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-    /*
-    axios.post(`http://localhost:8000/query`, { listing_url })
-      .then(res => {
-        console.log(res);
-        console.log(res.data);
-        //this.setState({ tileData: res.data})
-=======
-    axios.post(`http://jsonplaceholder.typicode.com/users`, { url: listing_url })
-      .then(res => {
-        this.setState({ tileData: res.data})
->>>>>>> f80845ef5f4909f090aeaf1df5626fbee0be90e4
+      .then(function (response) {
+        console.log(response);
+        this.setState({ tileData: response.data })
       })
-      */
+      .catch(function (error) {
+        alert("Something seems wrong. Please try again later.");
+        console.log(error);
+      });
   };
 
   state = {
-    tileData :
-      [{
-        picture_url: 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&h=350',
-        listing_id: '18461891',
-        listing_url: 'https://www.airbnb.com/rooms/18461891',
-      },
-        {
-          picture_url: 'https://a0.muscache.com/im/pictures/102394774/b3fe45ce_original.jpg?aki_policy=large',
-          listing_id: '21135710',
-          listing_url: 'https://www.airbnb.com/rooms/21135710',
-        }],
+    tileData : [],
     name : ''
   };
 
