@@ -14,8 +14,8 @@ const styles = theme => ({
     backgroundColor: theme.palette.background.paper,
   },
   gridList: {
-    width: 500,
-    height: 450,
+    width: 1000,
+    height: 1000,
   },
   icon: {
     color: 'rgba(255, 255, 255, 0.54)',
@@ -27,7 +27,7 @@ class TitlebarGridList extends Component {
     const { classes,  tileData} = this.props;
     return (
       <div className={classes.root}>
-        <GridList cellHeight={180} className={classes.gridList}>
+        <GridList cellHeight={280} className={classes.gridList}>
           {tileData.map(tile => (
             <GridListTile key={tile.picture_url}>
               <img src={tile.picture_url} alt={tile.title} />

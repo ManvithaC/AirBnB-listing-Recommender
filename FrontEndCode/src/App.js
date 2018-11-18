@@ -28,30 +28,21 @@ const styles = theme => ({
 
 class App extends Component {
 
-  getRecommendedListings = () => {
-
-    
-   
-      
-
-    axios.post('http://localhost:8000/query', {
-      url: this.state.name
-    })
-      .then(function (response) {
-        console.log(response);
-        this.setState({ tileData: response.data })
-      })
-      .catch(function (error) {
-        alert("Something seems wrong. Please try again later.");
-        console.log(error);
-      });
-
-  };
-
   state = {
     tileData : [],
     name : ''
   };
+
+  getRecommendedListings = () => {
+    axios.post('http://localhost:8000/query', {
+      url: this.state.name
+    }).then((response) => this.renderTileData(response.data))
+      .catch(() => alert("Something seems wrong. Please try again later."));
+  };
+
+ renderTileData = (data) => {
+  this.setState({ tileData: data})
+ }
 
   handleChange = name => event => {
     this.setState({
@@ -66,8 +57,8 @@ class App extends Component {
           <Typography className="mt-2" component="h4" variant="h4" gutterBottom>
             Airbnb Listings Recommendation System
           </Typography>
-          <div className="row">
-            <div className="mt-3 mr-5 ml-5 col-md-11">
+          <div className="row justify-content-center">
+            <div className="mt-3 mr-5 ml-5 col-md-8">
               <TextField
                 id="outlined-full-width"
                 label="Enter the listing URL"
@@ -90,7 +81,7 @@ class App extends Component {
           <div className="row justify-content-center">
             <FloatingActionButtons getRecommendedListings={this.getRecommendedListings}></FloatingActionButtons>
           </div>
-          <div className={"row m-5"}>
+        <div className={"row m-5 justify-content-center"}>
             <TitlebarGridList tileData={this.state.tileData}/>
           </div>
         </div>
