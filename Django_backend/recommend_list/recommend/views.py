@@ -11,18 +11,22 @@ import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
-
+from django.http import JsonResponse
+import json
+#Test
 
 words = stopwords.words("english")
 nltk.download('punkt')
 nltk.download('stopwords')
 stopwords_set = set(stopwords.words("english"))
-
+stop_words = set(stopwords.words('english'))
 dir_path = os.path.dirname(os.path.realpath(__file__))
+
 df = pd.read_csv(dir_path + '/listings_detail.csv', keep_default_na=False, skip_blank_lines=False, engine='python')
 df['cleaned_amenities'] = df['amenities'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stopwords_set)]))
 df['cleaned_amenities'] = df['cleaned_amenities'].str.replace(r"[\{\},]", ' ')
 df['cleaned_amenities'] = df['cleaned_amenities'].str.replace(r"[\"\',]", ' ')
+
 df_NLP_recommender = df[['listing_url','name', 'summary', 'space', 'neighborhood_overview', 'notes', 'transit', 'access', 'cleaned_amenities']]
 df_NLP_recommender['summary'] = df_NLP_recommender['summary'].map(lambda x: re.sub('[^a-zA-Z1-9!?.]', ' ', x))
 df_NLP_recommender['name'] = df_NLP_recommender['name'].map(lambda x: re.sub('[^a-zA-Z1-9!?.]', ' ', x))
@@ -34,14 +38,24 @@ df_NLP_recommender['transit'] = df_NLP_recommender['transit'].map(lambda x: re.s
 df_NLP_recommender['access'] = df_NLP_recommender['access'].map(lambda x: re.sub('[^a-zA-Z1-9!?.]', ' ', x))
 df_NLP_recommender['cleaned_amenities'] = df_NLP_recommender['cleaned_amenities'].map(lambda x: re.sub('[^a-zA-Z1-9!?.]', ' ', x))
 
-df_NLP_recommender['summary'].str.lower()
-df_NLP_recommender['name'].str.lower()
-df_NLP_recommender['space'].str.lower()
-df_NLP_recommender['neighborhood_overview'].str.lower()
-df_NLP_recommender['notes'].str.lower()
-df_NLP_recommender['transit'].str.lower()
-df_NLP_recommender['access'].str.lower()
-df_NLP_recommender['cleaned_amenities'].str.lower()
+df_NLP_recommender['summary'] = df_NLP_recommender['summary'].str.lower()
+df_NLP_recommender['name'] = df_NLP_recommender['name'].str.lower()
+df_NLP_recommender['space'] = df_NLP_recommender['space'].str.lower()
+df_NLP_recommender['neighborhood_overview'] = df_NLP_recommender['neighborhood_overview'].str.lower()
+df_NLP_recommender['notes'] = df_NLP_recommender['notes'].str.lower()
+df_NLP_recommender['transit'] = df_NLP_recommender['transit'].str.lower()
+df_NLP_recommender['access'] = df_NLP_recommender['access'].str.lower()
+df_NLP_recommender['cleaned_amenities'] = df_NLP_recommender['cleaned_amenities'].str.lower()
+
+
+df_NLP_recommender['summary'] = df_NLP_recommender['summary'].str.split(' ').apply(lambda x: ' '.join(k for k in x if k not in stop_words))
+df_NLP_recommender['name'] = df_NLP_recommender['name'].str.split(' ').apply(lambda x: ' '.join(k for k in x if k not in stop_words))
+df_NLP_recommender['space'] = df_NLP_recommender['space'].str.split(' ').apply(lambda x: ' '.join(k for k in x if k not in stop_words))
+df_NLP_recommender['neighborhood_overview'] = df_NLP_recommender['neighborhood_overview'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stop_words)]))
+df_NLP_recommender['notes'] = df_NLP_recommender['notes'].str.split(' ').apply(lambda x: ' '.join(k for k in x if k not in stop_words))
+df_NLP_recommender['transit'] = df_NLP_recommender['transit'].str.split(' ').apply(lambda x: ' '.join(k for k in x if k not in stop_words))
+df_NLP_recommender['access'] = df_NLP_recommender['access'].str.split(' ').apply(lambda x: ' '.join(k for k in x if k not in stop_words))
+df_NLP_recommender['cleaned_amenities'] = df_NLP_recommender['cleaned_amenities'].str.split(' ').apply(lambda x: ' '.join(k for k in x if k not in stop_words))
 
 print(df_NLP_recommender['summary'][0])
 df_NLP_recommender.set_index('listing_url', inplace = True)
@@ -62,7 +76,7 @@ vectorizer = TfidfVectorizer(sublinear_tf=True, min_df=6, stop_words='english')
 recommender_matrix = vectorizer.fit_transform(df_NLP_recommender['combined_columns'])
 index = pd.Series(df_NLP_recommender.index)
 from sklearn.decomposition import TruncatedSVD
-svd = TruncatedSVD(n_components=1400, n_iter=7, random_state=42)
+svd = TruncatedSVD(n_components=70, n_iter=7, random_state=42)
 recommender_matrix = svd.fit_transform(recommender_matrix)
 
 cosine_sim = cosine_similarity(recommender_matrix, recommender_matrix)
@@ -90,16 +104,21 @@ def home(request):
 
 @csrf_exempt
 def listingDetails(request):
-    listing_url = request.POST['url']
+    #listing_url = request.POST.get('url')
+    #listing_url = request.GET.get('url')
+    listing_url1 = json.loads(request.body)
+    #print(listing_url)
+    listing_url = listing_url1['url']
+    #print(test)
     result = predict_NLP(str(listing_url))
     first_choice = df.loc[df['listing_url'] == result[0]]
     first_id = first_choice['id'].tolist()[0]
     first_url = first_choice['listing_url'].tolist()[0]
     first_picture = first_choice['picture_url'].tolist()[0]
-    response_data1 = {}
-    response_data1['listing_id'] = first_id
-    response_data1['listing_url'] = first_url
-    response_data1['picture_url'] = first_picture
+    response_data1 = {'listing_id': first_id, 'listing_url': first_url, 'picture_url': first_picture}
+    #response_data1['listing_id'] = first_id
+    #response_data1['listing_url'] = first_url
+    #response_data1['picture_url'] = first_picture
 
     second_choice = df.loc[df['listing_url'] == result[1]]
     second_id = second_choice['id'].tolist()[0]
@@ -141,4 +160,4 @@ def listingDetails(request):
 
 
     return HttpResponse(json.dumps(final_data), content_type="application/json")
-    #return JsonResponse(response_data)
+    #return JsonResponse(final_data)
